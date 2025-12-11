@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #f3f3f3;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  cursor: url('../img/hammer26.png') 16 16, auto;
+}
+
+.game-field {
+  width: 400px;
+  height: 400px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.cell {
+  background: #e0e0e0;
+  border: 2px solid #bdbdbd;
+  position: relative;
+}
+
+.cell:hover {
+  background: #d5d5d5;
+}
+
+.goblin {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
