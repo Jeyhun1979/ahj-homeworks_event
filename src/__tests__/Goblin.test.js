@@ -16,6 +16,10 @@ describe('Goblin class', () => {
     expect(goblin.img.classList.contains('goblin')).toBe(true);
   });
 
+  test('img should have alt attribute', () => {
+    expect(goblin.img.alt).toBe('Гоблин');
+  });
+
   test('currentIndex should be null initially', () => {
     expect(goblin.currentIndex).toBeNull();
   });

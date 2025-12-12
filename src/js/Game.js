@@ -8,17 +8,26 @@ export default class Game {
     this.goblin = new Goblin();
     this.score = 0;
     this.missed = 0;
+    this.maxMissed = 5; 
     this.currentTimeout = null;
     this.isGameOver = false;
   }
 
   init() {
-    this.createField();
+    const container = document.createElement('div');
+    container.id = 'game-container';
+    container.style.display = 'flex';
+    container.style.alignItems = 'flex-start';
+
+    this.root.append(container);
+
+    this.createScoreBoard(container);
+    this.createField(container);
     this.addEventListeners();
     this.showGoblin();
   }
 
-  createField() {
+  createField(container) {
     const field = document.createElement('div');
     field.classList.add('game-field');
 
@@ -29,21 +38,39 @@ export default class Game {
       this.cells.push(cell);
     }
 
-    this.root.append(field);
+    container.append(field);
+  }
+
+  createScoreBoard(container) {
+    const board = document.createElement('div');
+    board.id = 'score-board';
+    board.innerHTML = `
+      <p>Счёт: <span id="score">0</span></p>
+      <p>Пропущено: <span id="missed">0</span></p>
+      <div id="game-over" style="display:none;">
+        <p>Игра окончена. Ваш счёт: <span id="final-score"></span></p>
+      </div>
+    `;
+    board.style.marginLeft = '20px';
+    container.append(board);
+  }
+
+  updateScoreBoard() {
+    document.getElementById('score').textContent = this.score;
+    document.getElementById('missed').textContent = this.missed;
   }
 
   addEventListeners() {
     this.root.addEventListener('click', (event) => {
       if (event.target === this.goblin.img) {
         this.score++;
-        const index = this.goblin.currentIndex;
-        if (this.cells[index].contains(this.goblin.img)) {
-          this.cells[index].removeChild(this.goblin.img);
-        }
+        this.goblin.img.remove();
         if (this.currentTimeout) {
           clearTimeout(this.currentTimeout);
           this.currentTimeout = null;
         }
+        this.updateScoreBoard();
+
         if (!this.isGameOver) {
           this.showGoblin();
         }
@@ -52,7 +79,7 @@ export default class Game {
   }
 
   showGoblin() {
-    if (this.missed >= 5) {
+    if (this.missed >= this.maxMissed) {
       this.stopGame();
       return;
     }
@@ -61,7 +88,7 @@ export default class Game {
     const index = this.getRandomIndex(previousIndex);
 
     if (previousIndex !== null && this.cells[previousIndex].contains(this.goblin.img)) {
-      this.cells[previousIndex].removeChild(this.goblin.img);
+      this.goblin.img.remove();
     }
 
     this.cells[index].append(this.goblin.img);
@@ -69,11 +96,12 @@ export default class Game {
 
     this.currentTimeout = setTimeout(() => {
       if (this.cells[index].contains(this.goblin.img)) {
-        this.cells[index].removeChild(this.goblin.img);
+        this.goblin.img.remove();
         this.missed++;
+        this.updateScoreBoard();
       }
 
-      if (this.missed >= 5) {
+      if (this.missed >= this.maxMissed) {
         this.stopGame();
       } else if (!this.isGameOver) {
         this.showGoblin();
@@ -95,9 +123,10 @@ export default class Game {
       clearTimeout(this.currentTimeout);
       this.currentTimeout = null;
     }
-    if (this.cells[this.goblin.currentIndex]?.contains(this.goblin.img)) {
-      this.cells[this.goblin.currentIndex].removeChild(this.goblin.img);
-    }
-    alert(`Игра окончена. Ваш счёт: ${this.score}`);
+    this.goblin.img.remove();
+
+    const gameOverDiv = document.getElementById('game-over');
+    document.getElementById('final-score').textContent = this.score;
+    gameOverDiv.style.display = 'block';
   }
 }

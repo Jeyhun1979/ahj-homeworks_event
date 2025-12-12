@@ -9,8 +9,8 @@ describe('Game with event delegation', () => {
   let game;
 
   beforeEach(() => {
-    document.body.innerHTML = '<div id="root"></div>';
-    game = new Game('#root');
+    document.body.innerHTML = '<div id="game-root"></div>';
+    game = new Game('#game-root');
     jest.useFakeTimers();
     game.init();
   });
@@ -28,6 +28,7 @@ describe('Game with event delegation', () => {
 
     expect(game.score).toBe(1);
     expect(cell.contains(game.goblin.img)).toBe(false);
+    expect(document.getElementById('score').textContent).toBe('1');
   });
 
   test('Missed goblins increase missed counter', () => {
@@ -38,16 +39,15 @@ describe('Game with event delegation', () => {
 
     expect(game.missed).toBe(1);
     expect(cell.contains(game.goblin.img)).toBe(false);
+    expect(document.getElementById('missed').textContent).toBe('1');
   });
 
-  test('Game stops after 5 missed goblins', () => {
-    jest.spyOn(window, 'alert').mockImplementation(() => {});
+  test('Game stops after maxMissed missed goblins', () => {
+    jest.advanceTimersByTime(game.maxMissed * 1000);
 
-    jest.advanceTimersByTime(5000);
-
-    expect(game.missed).toBe(5);
-    expect(window.alert).toHaveBeenCalledWith(
-      `Игра окончена. Ваш счёт: ${game.score}`
-    );
+    expect(game.missed).toBe(game.maxMissed);
+    const gameOverDiv = document.getElementById('game-over');
+    expect(gameOverDiv.style.display).toBe('block');
+    expect(document.getElementById('final-score').textContent).toBe(game.score.toString());
   });
 });
